@@ -6,3 +6,11 @@
 //
 
 import Foundation
+
+struct TransactionModel: Identifiable {
+    let id: String
+    let title: String
+    let amount: Int
+    let date: Date
+    let category: CategoryModel
+}

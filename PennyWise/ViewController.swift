@@ -8,12 +8,25 @@
 import UIKit
 
 class ViewController: UIViewController {
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
     }
-
-
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        print("MASUK")
+        navigationController?.pushViewController(OnboardingVC(), animated: false)
+    }
+    
+//    private func checkLogin(){
+//        let token = UserDefaultService.shared.getToken()
+//        
+//        if token.isNilOrEmpty{
+//            navigationController?.pushViewController(LoginVC(), animated: false)
+//        } else {
+//            navigationController?.pushViewController(HomeVC(), animated: false)
+//        }
+//    }
 }
 

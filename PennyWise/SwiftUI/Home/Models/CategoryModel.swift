@@ -7,12 +7,14 @@
 
 import Foundation
 
-struct CategoryModel: Identifiable {
-    let id = UUID()
+struct CategoryModel: Identifiable, Hashable {
+    let id: String
     let name: String
-    let amount: Int
+    let type: CategoryType   // income / expense
+    let colorHex: String
+}
 
-    var amountFormatted: String {
-        "Rp \(amount)"
-    }
+enum CategoryType: String {
+    case income
+    case expense
 }

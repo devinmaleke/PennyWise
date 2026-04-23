@@ -9,21 +9,25 @@ import UIKit
 
 class OnboardingVC: UIViewController {
 
+    @IBOutlet weak var footerBgView: UIView!
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
+        footerBgView.layer.shadowColor = UIColor.black.cgColor
+        footerBgView.layer.shadowOpacity = 0.2
+        
     }
-
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    
+    
+    @IBAction func didTapButton(_ sender: UIButton) {
+        if sender.tag == 0{
+            //Login
+            self.navigationController?.pushViewController(LoginVC(), animated: true)
+        }else{
+            //register
+            self.navigationController?.pushViewController(RegisterVC(), animated: true)
+        }
     }
-    */
+    
 
 }

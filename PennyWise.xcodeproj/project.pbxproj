@@ -6,8 +6,17 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		37808B252F2C9A11009276A9 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 37808B242F2C9A11009276A9 /* GoogleService-Info.plist */; };
+		AD8696C4FD4DE82D1472282C /* Pods_PennyWise.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AFB95C3B201ABA18D2280B19 /* Pods_PennyWise.framework */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
+		37808B242F2C9A11009276A9 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		37DD37D62F1DE6C000CF272E /* PennyWise.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PennyWise.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		46CA84C2DA8D40EBF57C75E2 /* Pods-PennyWise.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PennyWise.debug.xcconfig"; path = "Target Support Files/Pods-PennyWise/Pods-PennyWise.debug.xcconfig"; sourceTree = "<group>"; };
+		AFB95C3B201ABA18D2280B19 /* Pods_PennyWise.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PennyWise.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C7B86F01397039CA9C64638F /* Pods-PennyWise.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PennyWise.release.xcconfig"; path = "Target Support Files/Pods-PennyWise/Pods-PennyWise.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -36,6 +45,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AD8696C4FD4DE82D1472282C /* Pods_PennyWise.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -47,6 +57,9 @@
 			children = (
 				37DD37D82F1DE6C000CF272E /* PennyWise */,
 				37DD37D72F1DE6C000CF272E /* Products */,
+				F010FB2031B594F45F2D7E01 /* Pods */,
+				D618F9C266CCA8E84534C937 /* Frameworks */,
+				37808B242F2C9A11009276A9 /* GoogleService-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -58,6 +71,23 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		D618F9C266CCA8E84534C937 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				AFB95C3B201ABA18D2280B19 /* Pods_PennyWise.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		F010FB2031B594F45F2D7E01 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				46CA84C2DA8D40EBF57C75E2 /* Pods-PennyWise.debug.xcconfig */,
+				C7B86F01397039CA9C64638F /* Pods-PennyWise.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -65,9 +95,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 37DD37E92F1DE6C400CF272E /* Build configuration list for PBXNativeTarget "PennyWise" */;
 			buildPhases = (
+				CA91483FD219954F1F48AF34 /* [CP] Check Pods Manifest.lock */,
 				37DD37D22F1DE6C000CF272E /* Sources */,
 				37DD37D32F1DE6C000CF272E /* Frameworks */,
 				37DD37D42F1DE6C000CF272E /* Resources */,
+				494297F7185BB4DFE0D26AC7 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -77,8 +109,6 @@
 				37DD37D82F1DE6C000CF272E /* PennyWise */,
 			);
 			name = PennyWise;
-			packageProductDependencies = (
-			);
 			productName = PennyWise;
 			productReference = 37DD37D62F1DE6C000CF272E /* PennyWise.app */;
 			productType = "com.apple.product-type.application";
@@ -122,10 +152,57 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				37808B252F2C9A11009276A9 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		494297F7185BB4DFE0D26AC7 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-PennyWise/Pods-PennyWise-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-PennyWise/Pods-PennyWise-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PennyWise/Pods-PennyWise-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		CA91483FD219954F1F48AF34 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-PennyWise-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		37DD37D22F1DE6C000CF272E /* Sources */ = {
@@ -140,6 +217,7 @@
 /* Begin XCBuildConfiguration section */
 		37DD37EA2F1DE6C400CF272E /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 46CA84C2DA8D40EBF57C75E2 /* Pods-PennyWise.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -153,6 +231,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 14;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -168,6 +247,7 @@
 		};
 		37DD37EB2F1DE6C400CF272E /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C7B86F01397039CA9C64638F /* Pods-PennyWise.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -181,6 +261,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 14;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

@@ -6,14 +6,29 @@
 //
 
 import UIKit
+import FirebaseCore
+import IQKeyboardManagerSwift
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
+    var window: UIWindow?
 
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+    ) -> Bool {
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        // Untuk iOS 12 ke bawah
+        window?.makeKeyAndVisible()
+        window?.rootViewController?.overrideUserInterfaceStyle = .light
+        FirebaseApp.configure()
+        
+        
+         IQKeyboardManager.shared.isEnabled = true
+         IQKeyboardManager.shared.layoutIfNeededOnUpdate = true
+         IQKeyboardManager.shared.resignOnTouchOutside = true
+        
         return true
     }
 

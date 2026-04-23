@@ -9,21 +9,44 @@ import UIKit
 
 class RegisterVC: UIViewController {
 
+    @IBOutlet weak var nameTF: UITextField!
+    @IBOutlet weak var emailTF: UITextField!
+    @IBOutlet weak var passwordTF: UITextField!
+    @IBOutlet weak var registerButton: UIButton!
+    @IBOutlet weak var backButton: UIButton!
+    
+    private let viewModel = RegisterViewModel()
+
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+        bindViewModel()
+        backButton.titleLabel?.text = ""
     }
 
+    private func bindViewModel() {
+        viewModel.onRegisterSuccess = { [weak self] in
+            DispatchQueue.main.async {
+                let mainTab = LoginVC()
+                mainTab.modalPresentationStyle = .fullScreen
+                self?.present(mainTab, animated: true)
+            }
+        }
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+        viewModel.onError = { [weak self] message in
+            self?.showAlert(message)
+        }
     }
-    */
 
+    @IBAction func didTapRegister(_ sender: UIButton) {
+        viewModel.register(
+            name: nameTF.text ?? "",
+            email: emailTF.text ?? "",
+            password: passwordTF.text ?? ""
+        )
+    }
+    
+    @IBAction func didTapBackButton(_ sender: UIButton) {
+        self.navigationController?.popViewController(animated: true)
+    }
+    
 }
