@@ -2,7 +2,7 @@
 //  LoginViewModel.swift
 //  PennyWise
 //
-//  Created by Samir iOS on 30/01/26.
+//  Created by Devin Maleke on 30/01/26.
 //
 
 import Foundation
@@ -20,14 +20,16 @@ final class LoginViewModel {
 
     // MARK: - Action
     func login() {
-        guard !email.isEmpty, !password.isEmpty else {
-            onError?("Email dan password tidak boleh kosong")
+        let trimmedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard !trimmedEmail.isEmpty, !password.isEmpty else {
+            onError?("Email and password cannot be empty")
             return
         }
 
         onLoading?(true)
 
-        AuthService.shared.login(email: email, password: password) { [weak self] result in
+        AuthService.shared.login(email: trimmedEmail, password: password) { [weak self] result in
             DispatchQueue.main.async {
                 self?.onLoading?(false)
 
@@ -35,13 +37,9 @@ final class LoginViewModel {
                 case .success:
                     self?.onSuccess?()
                 case .failure(let error):
-                    let nsError = error as NSError
-                    print("Firebase Error Code:", nsError.code)
-                    print("Firebase Error:", nsError.localizedDescription)
-                    self?.onError?(error.localizedDescription)
+                    self?.onError?(AppErrorMapper.message(for: error))
                 }
             }
         }
     }
 }
-

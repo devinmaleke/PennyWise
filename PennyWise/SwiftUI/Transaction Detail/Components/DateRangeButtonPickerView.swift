@@ -2,7 +2,7 @@
 //  DateRangeButtonPickerView.swift
 //  PennyWise
 //
-//  Created by Samir iOS on 21/01/26.
+//  Created by Devin Maleke on 21/01/26.
 //
 
 import SwiftUI
@@ -11,33 +11,46 @@ struct DateRangeButtonPickerView: View {
 
     @Binding var startDate: Date
     @Binding var endDate: Date
+    var onApply: () -> Void
 
+    @State private var draftStart: Date
+    @State private var draftEnd: Date
     @State private var showStartPicker = false
     @State private var showEndPicker = false
 
-    var onApply: () -> Void
     @Environment(\.presentationMode) private var presentationMode
+
+    init(
+        startDate: Binding<Date>,
+        endDate: Binding<Date>,
+        onApply: @escaping () -> Void
+    ) {
+        self._startDate = startDate
+        self._endDate = endDate
+        self.onApply = onApply
+        self._draftStart = State(initialValue: startDate.wrappedValue)
+        self._draftEnd = State(initialValue: endDate.wrappedValue)
+    }
 
     var body: some View {
         NavigationView {
-            ZStack{
-                Color.white.edgesIgnoringSafeArea(.all)
+            ZStack {
+                Color.appBackground.edgesIgnoringSafeArea(.all)
                 VStack(spacing: 20) {
-                    
                     dateButton(
                         title: "Start Date",
-                        date: startDate
+                        date: draftStart
                     ) {
                         showStartPicker = true
                     }
-                    
+
                     dateButton(
                         title: "End Date",
-                        date: endDate
+                        date: draftEnd
                     ) {
                         showEndPicker = true
                     }
-                    
+
                     Spacer()
                 }
                 .padding()
@@ -45,47 +58,53 @@ struct DateRangeButtonPickerView: View {
                 .toolbar {
                     ToolbarItem(placement: .principal) {
                         Text("Choose Date")
-                            .foregroundColor(Color(hex: "1D2E3E"))
+                            .foregroundColor(Color.appInk)
                             .bold()
                     }
                 }
                 .navigationBarItems(
-                    leading: Button(action: {
-                        presentationMode.wrappedValue.dismiss()
-                    }, label: {
+                    leading: Button(action: cancel, label: {
                         Text("Cancel")
-                            .foregroundColor(Color.init(hex: "1D2E3E"))
+                            .foregroundColor(Color.appInk)
                     }),
-                    trailing: Button(action: {
-                        presentationMode.wrappedValue.dismiss()
-                    }, label: {
+                    trailing: Button(action: apply, label: {
                         Text("Apply")
-                            .foregroundColor(Color.init(hex: "1D2E3E"))
+                            .foregroundColor(Color.appInk)
                     })
                 )
                 .sheet(isPresented: $showStartPicker) {
                     singleDatePicker(
                         title: "Start Date",
-                        selection: $startDate,
-                        maxDate: .today
+                        selection: $draftStart,
+                        maxDate: Date()
                     )
                 }
                 .sheet(isPresented: $showEndPicker) {
                     singleDatePicker(
                         title: "End Date",
-                        selection: $endDate,
-                        minDate: startDate,
-                        maxDate: endDate
+                        selection: $draftEnd,
+                        minDate: draftStart,
+                        maxDate: Date()
                     )
                 }
             }
         }
-        .background(Color.red)
-        .onChange(of: startDate) { newValue in
-            if endDate < newValue {
-                endDate = newValue
+        .onChange(of: draftStart) { newValue in
+            if draftEnd < newValue {
+                draftEnd = newValue
             }
         }
+    }
+
+    private func cancel() {
+        presentationMode.wrappedValue.dismiss()
+    }
+
+    private func apply() {
+        startDate = draftStart
+        endDate = max(draftEnd, draftStart)
+        onApply()
+        presentationMode.wrappedValue.dismiss()
     }
 
     private func dateButton(
@@ -96,14 +115,14 @@ struct DateRangeButtonPickerView: View {
         Button(action: action) {
             HStack {
                 Text(title)
-                    .foregroundColor(Color.init(hex: "466C85"))
+                    .foregroundColor(Color.appMuted)
                     .bold()
                 Spacer()
                 Text(date.formatted())
-                    .foregroundColor(.gray)
+                    .foregroundColor(Color.appInk)
             }
             .padding()
-            .background(Color.white)
+            .background(Color.appCard)
             .cornerRadius(8)
             .shadow(radius: 1)
         }
@@ -120,7 +139,7 @@ struct DateRangeButtonPickerView: View {
                 .font(.headline)
                 .padding()
 
-            if let min = minDate, let max = maxDate {
+            if let min = minDate, let max = maxDate, min <= max {
                 DatePicker(
                     "",
                     selection: selection,
@@ -146,8 +165,8 @@ struct DateRangeButtonPickerView: View {
         }
         .datePickerStyle(WheelDatePickerStyle())
         .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.appBackground)
+        .foregroundColor(Color.appInk)
     }
-
-
-
 }

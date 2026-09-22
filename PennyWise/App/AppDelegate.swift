@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  PennyWise
 //
-//  Created by Samir iOS on 19/01/26.
+//  Created by Devin Maleke on 19/01/26.
 //
 
 import UIKit
@@ -21,7 +21,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // Untuk iOS 12 ke bawah
         window?.makeKeyAndVisible()
-        window?.rootViewController?.overrideUserInterfaceStyle = .light
         FirebaseApp.configure()
         
         

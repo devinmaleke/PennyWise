@@ -2,7 +2,7 @@
 //  TransactionDetailViewModel.swift
 //  PennyWise
 //
-//  Created by Samir iOS on 18/03/26.
+//  Created by Devin Maleke on 18/03/26.
 //
 
 import Foundation
@@ -14,40 +14,64 @@ final class TransactionDetailViewModel: ObservableObject {
     @Published var startDate: Date
     @Published var endDate: Date
     @Published var showDatePicker = false
+    @Published var searchText = ""
 
-    private let allTransactions: [TransactionModel]
+    @Published private var allTransactions: [TransactionModel]
 
-    init(category: CategoryModel, transactions: [TransactionModel]) {
+    init(
+        category: CategoryModel,
+        transactions: [TransactionModel],
+        startDate: Date? = nil,
+        endDate: Date? = nil
+    ) {
         self.category = category
         self.allTransactions = transactions
-        self.startDate = transactions.map(\.date).min() ?? Date()
-        self.endDate = Date()
+        self.startDate = startDate ?? transactions.map(\.date).min() ?? Date()
+        self.endDate = endDate ?? Date()
+    }
+
+    func apply(_ result: TransactionFormResult) {
+        switch result {
+        case .saved(let transaction):
+            if transaction.category.id != category.id {
+                allTransactions.removeAll { $0.id == transaction.id }
+            } else if let index = allTransactions.firstIndex(where: { $0.id == transaction.id }) {
+                allTransactions[index] = transaction
+            } else {
+                allTransactions.append(transaction)
+            }
+        case .deleted(let id):
+            allTransactions.removeAll { $0.id == id }
+        }
     }
 
     // MARK: - Filtered by date range
 
-    var filteredTransactions: [TransactionModel] {
+    var isSearching: Bool {
+        !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    var dateFilteredTransactions: [TransactionModel] {
         let start = Calendar.current.startOfDay(for: startDate)
         let end = Calendar.current.date(bySettingHour: 23, minute: 59, second: 59, of: endDate) ?? endDate
 
         return allTransactions.filter { $0.date >= start && $0.date <= end }
     }
 
+    var filteredTransactions: [TransactionModel] {
+        dateFilteredTransactions.filter { $0.matches(searchText) }
+    }
+
     // MARK: - Total
 
     var totalAmount: Int {
-        filteredTransactions.reduce(0) { $0 + $1.amount }
+        dateFilteredTransactions.reduce(0) { $0 + $1.amount }
     }
 
     // MARK: - Formatted total
 
     var formattedTotal: String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.currencyCode = "IDR"
-        formatter.currencySymbol = "Rp "
-        formatter.maximumFractionDigits = 0
-        return formatter.string(from: NSNumber(value: totalAmount)) ?? "Rp 0"
+        totalAmount.asRupiah
     }
 
     // MARK: - Date label
@@ -62,13 +86,14 @@ final class TransactionDetailViewModel: ObservableObject {
 
     // MARK: - Grouped by date (untuk section header)
 
-    var groupedByDate: [(key: String, value: [TransactionModel])] {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd MMM yyyy"
+    var thisMonthBudgetStatus: CategoryBudgetStatus? {
+        let spent = allTransactions
+            .filter { Calendar.current.isDate($0.date, equalTo: Date(), toGranularity: .month) }
+            .reduce(0) { $0 + $1.amount }
+        return CategoryBudgetStatus.from(category: category, spent: spent)
+    }
 
-        let grouped = Dictionary(grouping: filteredTransactions) {
-            formatter.string(from: $0.date)
-        }
-        return grouped.sorted { $0.key > $1.key }
+    var groupedByDate: [(key: String, value: [TransactionModel])] {
+        filteredTransactions.groupedByDayDescending()
     }
 }

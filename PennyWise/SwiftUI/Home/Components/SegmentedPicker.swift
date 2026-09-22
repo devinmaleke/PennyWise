@@ -2,7 +2,7 @@
 //  SegmentedPicker.swift
 //  PennyWise
 //
-//  Created by Samir iOS on 20/01/26.
+//  Created by Devin Maleke on 20/01/26.
 //
 
 
@@ -12,10 +12,10 @@ struct CustomSegmentedControl: View {
     @Binding var selectedOption: Options
     @Environment(\.colorScheme) var colorScheme
     var backgroundColorSegmentedControl: Color {
-        return colorScheme == .dark ? .gray.opacity(0.4) : .gray.opacity(0.14)
+        colorScheme == .dark ? Color.appFill : Color.gray.opacity(0.14)
     }
     var selectedButtonBackgroundColor: Color {
-        return .white
+        Color.appCard
     }
     
     var body: some View {
@@ -26,17 +26,11 @@ struct CustomSegmentedControl: View {
                 Button {
                     selectedOption = option
                 } label: {
-                    HStack {
-                        if isSelected {
-                            Text(option.rawValue)
-                        } else {
-                            Text(option.rawValue)
-                        }
-                    }
+                    Text(option.rawValue)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 6)
-                .foregroundColor(isSelected ? Color.black : Color.gray)
+                .foregroundColor(isSelected ? Color.appInk : Color.appMuted)
                 .background(isSelected ? selectedButtonBackgroundColor : Color.clear)
                 .clipShape(RoundedRectangle(cornerRadius: 7))
                 .padding(.vertical, 2)

@@ -2,7 +2,7 @@
 //  RegisterVC.swift
 //  PennyWise
 //
-//  Created by Samir iOS on 22/01/26.
+//  Created by Devin Maleke on 22/01/26.
 //
 
 import UIKit
@@ -14,22 +14,42 @@ class RegisterVC: UIViewController {
     @IBOutlet weak var passwordTF: UITextField!
     @IBOutlet weak var registerButton: UIButton!
     @IBOutlet weak var backButton: UIButton!
-    
+
     private let viewModel = RegisterViewModel()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         bindViewModel()
-        backButton.titleLabel?.text = ""
+        backButton.setTitle("", for: .normal)
+        applyAppearance()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        applyAppearance()
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        applyAppearance()
+    }
+
+    private func applyAppearance() {
+        AuthAppearance.apply(
+            to: self,
+            fields: [nameTF, emailTF, passwordTF],
+            backButton: backButton,
+            filledButtons: [registerButton]
+        )
     }
 
     private func bindViewModel() {
-        viewModel.onRegisterSuccess = { [weak self] in
-            DispatchQueue.main.async {
-                let mainTab = LoginVC()
-                mainTab.modalPresentationStyle = .fullScreen
-                self?.present(mainTab, animated: true)
-            }
+        viewModel.onLoading = { [weak self] isLoading in
+            self?.setLoading(isLoading)
+        }
+
+        viewModel.onRegisterSuccess = {
+            AppRouter.showMainApp()
         }
 
         viewModel.onError = { [weak self] message in
@@ -44,9 +64,8 @@ class RegisterVC: UIViewController {
             password: passwordTF.text ?? ""
         )
     }
-    
+
     @IBAction func didTapBackButton(_ sender: UIButton) {
         self.navigationController?.popViewController(animated: true)
     }
-    
 }

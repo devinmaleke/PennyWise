@@ -7,11 +7,37 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		24E100012F9E10000000000E /* PennyWiseWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 24E100012F9E100000000001 /* PennyWiseWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		37808B252F2C9A11009276A9 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 37808B242F2C9A11009276A9 /* GoogleService-Info.plist */; };
 		AD8696C4FD4DE82D1472282C /* Pods_PennyWise.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AFB95C3B201ABA18D2280B19 /* Pods_PennyWise.framework */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		24E100012F9E10000000000B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 37DD37CE2F1DE6C000CF272E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 24E100012F9E100000000004;
+			remoteInfo = PennyWiseWidget;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		24E100012F9E10000000000D /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				24E100012F9E10000000000E /* PennyWiseWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		24E100012F9E100000000001 /* PennyWiseWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PennyWiseWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		37808B242F2C9A11009276A9 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		37DD37D62F1DE6C000CF272E /* PennyWise.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PennyWise.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		46CA84C2DA8D40EBF57C75E2 /* Pods-PennyWise.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PennyWise.debug.xcconfig"; path = "Target Support Files/Pods-PennyWise/Pods-PennyWise.debug.xcconfig"; sourceTree = "<group>"; };
@@ -20,6 +46,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		24E100012F9E100000000003 /* Exceptions for "PennyWiseWidget" folder in "PennyWiseWidget" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 24E100012F9E100000000004 /* PennyWiseWidget */;
+		};
 		37DD37E82F1DE6C400CF272E /* Exceptions for "PennyWise" folder in "PennyWise" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -30,6 +63,14 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		24E100012F9E100000000002 /* PennyWiseWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				24E100012F9E100000000003 /* Exceptions for "PennyWiseWidget" folder in "PennyWiseWidget" target */,
+			);
+			path = PennyWiseWidget;
+			sourceTree = "<group>";
+		};
 		37DD37D82F1DE6C000CF272E /* PennyWise */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -41,6 +82,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		24E100012F9E100000000006 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		37DD37D32F1DE6C000CF272E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -56,6 +104,7 @@
 			isa = PBXGroup;
 			children = (
 				37DD37D82F1DE6C000CF272E /* PennyWise */,
+				24E100012F9E100000000002 /* PennyWiseWidget */,
 				37DD37D72F1DE6C000CF272E /* Products */,
 				F010FB2031B594F45F2D7E01 /* Pods */,
 				D618F9C266CCA8E84534C937 /* Frameworks */,
@@ -67,6 +116,7 @@
 			isa = PBXGroup;
 			children = (
 				37DD37D62F1DE6C000CF272E /* PennyWise.app */,
+				24E100012F9E100000000001 /* PennyWiseWidget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -91,6 +141,26 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		24E100012F9E100000000004 /* PennyWiseWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 24E100012F9E10000000000A /* Build configuration list for PBXNativeTarget "PennyWiseWidget" */;
+			buildPhases = (
+				24E100012F9E100000000005 /* Sources */,
+				24E100012F9E100000000006 /* Frameworks */,
+				24E100012F9E100000000007 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				24E100012F9E100000000002 /* PennyWiseWidget */,
+			);
+			name = PennyWiseWidget;
+			productName = PennyWiseWidget;
+			productReference = 24E100012F9E100000000001 /* PennyWiseWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		37DD37D52F1DE6C000CF272E /* PennyWise */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 37DD37E92F1DE6C400CF272E /* Build configuration list for PBXNativeTarget "PennyWise" */;
@@ -100,10 +170,12 @@
 				37DD37D32F1DE6C000CF272E /* Frameworks */,
 				37DD37D42F1DE6C000CF272E /* Resources */,
 				494297F7185BB4DFE0D26AC7 /* [CP] Embed Pods Frameworks */,
+				24E100012F9E10000000000D /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				24E100012F9E10000000000C /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				37DD37D82F1DE6C000CF272E /* PennyWise */,
@@ -123,6 +195,9 @@
 				LastSwiftUpdateCheck = 1610;
 				LastUpgradeCheck = 1610;
 				TargetAttributes = {
+					24E100012F9E100000000004 = {
+						CreatedOnToolsVersion = 16.1;
+					};
 					37DD37D52F1DE6C000CF272E = {
 						CreatedOnToolsVersion = 16.1;
 					};
@@ -143,11 +218,19 @@
 			projectRoot = "";
 			targets = (
 				37DD37D52F1DE6C000CF272E /* PennyWise */,
+				24E100012F9E100000000004 /* PennyWiseWidget */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		24E100012F9E100000000007 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		37DD37D42F1DE6C000CF272E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -205,6 +288,13 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		24E100012F9E100000000005 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		37DD37D22F1DE6C000CF272E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -214,24 +304,90 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		24E100012F9E10000000000C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 24E100012F9E100000000004 /* PennyWiseWidget */;
+			targetProxy = 24E100012F9E10000000000B /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		24E100012F9E100000000008 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = PennyWiseWidget/PennyWiseWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = A353S377CB;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PennyWiseWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PennyWise;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.custom.PennyWise.Widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		24E100012F9E100000000009 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = PennyWiseWidget/PennyWiseWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = A353S377CB;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PennyWiseWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PennyWise;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.custom.PennyWise.Widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		37DD37EA2F1DE6C400CF272E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 46CA84C2DA8D40EBF57C75E2 /* Pods-PennyWise.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = PennyWise/PennyWise.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = A353S377CB;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PennyWise/Info.plist;
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "PennyWise uses Face ID to keep your transactions private.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 14;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -251,17 +407,19 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = PennyWise/PennyWise.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = A353S377CB;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PennyWise/Info.plist;
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "PennyWise uses Face ID to keep your transactions private.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 14;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -312,7 +470,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -327,7 +485,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -375,7 +533,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -384,7 +542,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -397,6 +555,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		24E100012F9E10000000000A /* Build configuration list for PBXNativeTarget "PennyWiseWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				24E100012F9E100000000008 /* Debug */,
+				24E100012F9E100000000009 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		37DD37D12F1DE6C000CF272E /* Build configuration list for PBXProject "PennyWise" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

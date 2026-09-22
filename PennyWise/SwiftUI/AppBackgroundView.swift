@@ -2,7 +2,7 @@
 //  AppBackgroundView.swift
 //  PennyWise
 //
-//  Created by Samir iOS on 19/01/26.
+//  Created by Devin Maleke on 19/01/26.
 //
 
 import SwiftUI
@@ -12,8 +12,8 @@ struct AppBackgroundView: View {
     var body: some View {
         LinearGradient(
             gradient: Gradient(colors: [
-                Color(hex: "FAFAFA"), // atas
-                Color(hex: "FAFAFA")  // bawah
+                Color.appBackground, // atas
+                Color.appBackground  // bawah
             ]),
             startPoint: .top,
             endPoint: .bottom

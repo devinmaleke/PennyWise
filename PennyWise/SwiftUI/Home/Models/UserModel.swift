@@ -2,7 +2,7 @@
 //  UserModel.swift
 //  PennyWise
 //
-//  Created by Samir iOS on 24/02/26.
+//  Created by Devin Maleke on 24/02/26.
 //
 
 import Foundation

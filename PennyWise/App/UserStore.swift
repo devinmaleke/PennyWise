@@ -2,7 +2,7 @@
 //  UserStore.swift
 //  PennyWise
 //
-//  Created by Samir iOS on 24/02/26.
+//  Created by Devin Maleke on 24/02/26.
 //
 
 import Combine
@@ -18,6 +18,7 @@ final class UserStore: ObservableObject {
     private var listener: ListenerRegistration?
 
     func start() {
+        stop()
         guard let uid = Auth.auth().currentUser?.uid else { return }
 
         listener = Firestore.firestore()
@@ -26,11 +27,15 @@ final class UserStore: ObservableObject {
             .addSnapshotListener { [weak self] snapshot, _ in
                 guard let data = snapshot?.data() else { return }
 
-                self?.user = UserModel(
+                let user = UserModel(
                     id: uid,
                     name: data["name"] as? String ?? "",
                     email: data["email"] as? String ?? ""
                 )
+
+                DispatchQueue.main.async {
+                    self?.user = user
+                }
             }
     }
 

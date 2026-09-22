@@ -2,45 +2,51 @@
 //  RegisterViewModel.swift
 //  PennyWise
 //
-//  Created by Samir iOS on 30/01/26.
+//  Created by Devin Maleke on 30/01/26.
 //
 
-import FirebaseAuth
 import FirebaseFirestore
 
 class RegisterViewModel {
 
+    var onLoading: ((Bool) -> Void)?
     var onRegisterSuccess: (() -> Void)?
     var onError: ((String) -> Void)?
 
     func register(name: String, email: String, password: String) {
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        guard !name.isEmpty,
-              !email.isEmpty,
-              !password.isEmpty else {
+        guard !trimmedName.isEmpty, !trimmedEmail.isEmpty, !password.isEmpty else {
             onError?("All fields are required")
             return
         }
 
-        Auth.auth().createUser(withEmail: email, password: password) { [weak self] result, error in
+        guard password.count >= 6 else {
+            onError?("Password must be at least 6 characters")
+            return
+        }
 
-            if let error = error {
-                self?.handleFirebaseError(error)
-                return
+        onLoading?(true)
+
+        AuthService.shared.register(email: trimmedEmail, password: password) { [weak self] result in
+            switch result {
+            case .failure(let error):
+                DispatchQueue.main.async {
+                    self?.onLoading?(false)
+                    self?.onError?(AppErrorMapper.message(for: error))
+                }
+            case .success(let uid):
+                self?.saveUserToFirestore(
+                    uid: uid,
+                    name: trimmedName,
+                    email: trimmedEmail
+                )
             }
-
-            guard let uid = result?.user.uid else { return }
-
-            self?.saveUserToFirestore(
-                uid: uid,
-                name: name,
-                email: email
-            )
         }
     }
 
     private func saveUserToFirestore(uid: String, name: String, email: String) {
-
         Firestore.firestore()
             .collection("users")
             .document(uid)
@@ -50,26 +56,19 @@ class RegisterViewModel {
                 "createdAt": Timestamp()
             ]) { [weak self] error in
                 if let error = error {
-                    self?.onError?(error.localizedDescription)
-                } else {
-                    self?.onRegisterSuccess?()
+                    DispatchQueue.main.async {
+                        self?.onLoading?(false)
+                        self?.onError?(AppErrorMapper.message(for: error))
+                    }
+                    return
+                }
+
+                DefaultCategorySeeder.seedIfNeeded(for: uid) { _ in
+                    DispatchQueue.main.async {
+                        self?.onLoading?(false)
+                        self?.onRegisterSuccess?()
+                    }
                 }
             }
     }
-
-    private func handleFirebaseError(_ error: Error) {
-        let nsError = error as NSError
-
-        switch nsError.code {
-        case AuthErrorCode.emailAlreadyInUse.rawValue:
-            onError?("Email already in use")
-        case AuthErrorCode.invalidEmail.rawValue:
-            onError?("Invalid email format")
-        case AuthErrorCode.weakPassword.rawValue:
-            onError?("Password is too weak")
-        default:
-            onError?(nsError.localizedDescription)
-        }
-    }
 }
-

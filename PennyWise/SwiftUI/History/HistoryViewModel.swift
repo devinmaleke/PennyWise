@@ -2,7 +2,7 @@
 //  HistoryViewModel.swift
 //  PennyWise
 //
-//  Created by Samir iOS on 19/01/26.
+//  Created by Devin Maleke on 19/01/26.
 //
 
 import Foundation
@@ -42,17 +42,23 @@ enum FilterPeriod: String, CaseIterable {
 final class HistoryViewModel: ObservableObject {
 
     @Published var transactions: [TransactionModel] = []
+    @Published var categories: [String: CategoryModel] = [:]
     @Published var selectedType: CategoryType = .expense
     @Published var selectedPeriod: FilterPeriod = .thisWeek
+    @Published var searchText = ""
+    @Published var errorMessage: String?
 
     private var listener: ListenerRegistration?
+    private var categoryListener: ListenerRegistration?
 
     init() {
         startListening()
+        startListeningCategories()
     }
 
     deinit {
         listener?.remove()
+        categoryListener?.remove()
     }
 
     private func startListening() {
@@ -63,38 +69,20 @@ final class HistoryViewModel: ObservableObject {
             .document(uid)
             .collection("transactions")
             .order(by: "date", descending: true)
-            .addSnapshotListener { [weak self] snapshot, _ in
+            .addSnapshotListener { [weak self] snapshot, error in
+                if let error = error {
+                    DispatchQueue.main.async {
+                        self?.errorMessage = AppErrorMapper.message(for: error)
+                    }
+                    return
+                }
 
-                guard let documents = snapshot?.documents else { return }
+                let parsed = snapshot?.documents.compactMap {
+                    TransactionModel.from(document: $0)
+                } ?? []
 
-                self?.transactions = documents.compactMap { doc in
-                    let data = doc.data()
-                    
-                    guard
-                        let title = data["title"] as? String,
-                        let amount = data["amount"] as? Int,
-                        let timestamp = data["date"] as? Timestamp,
-                        let categoryId = data["categoryId"] as? String,
-                        let categoryName = data["categoryName"] as? String,
-                        let typeRaw = data["categoryType"] as? String,
-                        let colorHex = data["categoryColor"] as? String,
-                        let type = CategoryType(rawValue: typeRaw)
-                    else { return nil }
-
-                    let category = CategoryModel(
-                        id: categoryId,
-                        name: categoryName,
-                        type: type,
-                        colorHex: colorHex
-                    )
-
-                    return TransactionModel(
-                        id: doc.documentID,
-                        title: title,
-                        amount: amount,
-                        date: timestamp.dateValue(),
-                        category: category
-                    )
+                DispatchQueue.main.async {
+                    self?.transactions = parsed
                 }
             }
     }
@@ -102,11 +90,7 @@ final class HistoryViewModel: ObservableObject {
     // MARK: - Group by Date
 
     var groupedTransactions: [(key: String, value: [TransactionModel])] {
-        let grouped = Dictionary(grouping: filteredTransactions) {
-            formatDate($0.date)
-        }
-
-        return grouped.sorted { $0.key > $1.key }
+        filteredTransactions.groupedByDayDescending()
     }
 
     // MARK: - Total
@@ -115,39 +99,80 @@ final class HistoryViewModel: ObservableObject {
         filteredTransactions.reduce(0) { $0 + $1.amount }
     }
 
-    // MARK: - Formatter
+    var totalAmountFormatted: String {
+        totalAmount.asRupiah
+    }
 
-    private func formatDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd MMM yyyy"
-        return formatter.string(from: date)
+    private func startListeningCategories() {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+
+        categoryListener = Firestore.firestore()
+            .collection("users")
+            .document(uid)
+            .collection("categories")
+            .addSnapshotListener { [weak self] snapshot, error in
+                if let error = error {
+                    DispatchQueue.main.async {
+                        self?.errorMessage = AppErrorMapper.message(for: error)
+                    }
+                    return
+                }
+
+                var map: [String: CategoryModel] = [:]
+                snapshot?.documents.forEach { doc in
+                    if let category = CategoryModel.from(document: doc) {
+                        map[category.id] = category
+                    }
+                }
+
+                DispatchQueue.main.async {
+                    self?.categories = map
+                }
+            }
+    }
+
+    var showsMonthlyBudget: Bool {
+        selectedPeriod == .thisMonth && selectedType == .expense
+    }
+
+    var detailStartDate: Date {
+        selectedPeriod.dateRange?.start ?? transactions.map(\.date).min() ?? Date()
+    }
+
+    var detailEndDate: Date {
+        selectedPeriod.dateRange?.end ?? Date()
     }
     
     var groupedByCategory: [(category: CategoryModel, total: Int)] {
-        let grouped = Dictionary(grouping: filteredTransactions) {
-            $0.category
-        }
+        let grouped = Dictionary(grouping: filteredTransactions) { $0.category.id }
 
-        return grouped.map { (category, transactions) in
-            let total = transactions.reduce(0) { $0 + $1.amount }
-            return (category, total)
+        return grouped.compactMap { id, list -> (category: CategoryModel, total: Int)? in
+            guard let sample = list.first?.category else { return nil }
+            let total = list.reduce(0) { $0 + $1.amount }
+            return (categories[id] ?? sample, total)
         }
         .sorted { $0.total > $1.total }
     }
-    
+
+    var isSearching: Bool {
+        !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
     var filteredTransactions: [TransactionModel] {
         transactions.filter { transaction in
             guard transaction.category.type == selectedType else { return false }
-            
-            // filter by period
+
             if let range = selectedPeriod.dateRange {
-                return transaction.date >= range.start && transaction.date <= range.end
+                guard transaction.date >= range.start && transaction.date <= range.end else {
+                    return false
+                }
             }
-            return true // allTime = no date filter
+
+            return transaction.matches(searchText)
         }
     }
     
     func transactions(for category: CategoryModel) -> [TransactionModel] {
-        filteredTransactions.filter { $0.category.id == category.id }
+        transactions.filter { $0.category.id == category.id }
     }
 }

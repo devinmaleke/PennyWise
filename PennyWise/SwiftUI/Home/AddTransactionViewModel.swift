@@ -2,13 +2,17 @@
 //  AddTransactionViewModel.swift
 //  PennyWise
 //
-//  Created by Samir iOS on 02/02/26.
+//  Created by Devin Maleke on 02/02/26.
 //
 
 import Foundation
 import FirebaseAuth
 import FirebaseFirestore
-import UIKit
+
+enum TransactionFormResult {
+    case saved(TransactionModel)
+    case deleted(String)
+}
 
 final class AddTransactionViewModel: ObservableObject {
 
@@ -19,9 +23,32 @@ final class AddTransactionViewModel: ObservableObject {
     @Published var errorMessage: String?
 
     private let db = Firestore.firestore()
+    private var didAttemptDefaultSeed = false
+    private var editingTransactionId: String?
+    private var editingRecurringId = ""
+
+    var isEditing: Bool {
+        editingTransactionId != nil
+    }
 
     init() {
         fetchCategories()
+    }
+
+    func beginEditing(_ transaction: TransactionModel) {
+        editingTransactionId = transaction.id
+        editingRecurringId = transaction.recurringId
+        selectedCategory = matchingCategory(for: transaction.category)
+    }
+
+    func beginRepeat(_ transaction: TransactionModel) {
+        beginRepeat(category: transaction.category)
+    }
+
+    func beginRepeat(category: CategoryModel) {
+        editingTransactionId = nil
+        editingRecurringId = ""
+        selectedCategory = matchingCategory(for: category)
     }
 
     // MARK: - Fetch Categories
@@ -35,31 +62,33 @@ final class AddTransactionViewModel: ObservableObject {
 
                 if let error = error {
                     DispatchQueue.main.async {
-                        self?.errorMessage = error.localizedDescription
+                        self?.errorMessage = AppErrorMapper.message(for: error)
                     }
                     return
                 }
 
-                let list = snap?.documents.compactMap { doc -> CategoryModel? in
-                    let data = doc.data()
-                    
-                    print(data)
-                    guard
-                        let name = data["name"] as? String,
-                        let typeString = data["type"] as? String,
-                        let type = CategoryType(rawValue: typeString)
-                    else { return nil }
+                let list = snap?.documents.compactMap { CategoryModel.from(document: $0) } ?? []
 
-                    return CategoryModel(
-                        id: doc.documentID,
-                        name: name,
-                        type: type,
-                        colorHex: data["colorHex"] as? String ?? "#000000"
-                    )
-                } ?? []
-                
                 DispatchQueue.main.async {
+                    if list.isEmpty && !(self?.didAttemptDefaultSeed ?? true) {
+                        self?.didAttemptDefaultSeed = true
+                        DefaultCategorySeeder.seedIfNeeded(for: uid) { error in
+                            DispatchQueue.main.async {
+                                if let error = error {
+                                    self?.errorMessage = AppErrorMapper.message(for: error)
+                                    self?.categories = []
+                                    return
+                                }
+                                self?.fetchCategories()
+                            }
+                        }
+                        return
+                    }
+
                     self?.categories = list
+                    if let selected = self?.selectedCategory {
+                        self?.selectedCategory = list.first(where: { $0.id == selected.id }) ?? selected
+                    }
                 }
             }
     }
@@ -83,7 +112,9 @@ final class AddTransactionViewModel: ObservableObject {
         amount: Int,
         date: Date,
         isIncome: Bool,
-        completion: @escaping () -> Void
+        note: String,
+        frequency: RecurringFrequency? = nil,
+        completion: @escaping (TransactionModel) -> Void
     ) {
         guard
             let uid = Auth.auth().currentUser?.uid,
@@ -95,33 +126,197 @@ final class AddTransactionViewModel: ObservableObject {
 
         isLoading = true
 
-        let data: [String: Any] = [
-            "title": title,
-            "amount": amount,
-            "isIncome": isIncome,
-            "categoryId": category.id,
-            "categoryName": category.name,
-            "categoryType": category.type.rawValue,
-            "categoryColor": category.colorHex,
-            "date": Timestamp(date: date),
-            "createdAt": Timestamp(date: Date())
-        ]
+        let writeTransaction: (String, String?) -> Void = { [weak self] recurringId, occurrenceId in
+            self?.writeTransaction(
+                uid: uid,
+                title: title,
+                amount: amount,
+                date: date,
+                isIncome: isIncome,
+                note: note,
+                category: category,
+                recurringId: recurringId,
+                occurrenceId: occurrenceId,
+                completion: completion
+            )
+        }
 
-        db.collection("users")
+        guard let frequency = frequency, editingTransactionId == nil else {
+            writeTransaction(editingRecurringId, nil)
+            return
+        }
+
+        RecurringService.create(
+            title: title,
+            note: note,
+            amount: amount,
+            date: date,
+            category: category,
+            frequency: frequency
+        ) { [weak self] result in
+            switch result {
+            case .failure(let error):
+                DispatchQueue.main.async {
+                    self?.isLoading = false
+                    self?.errorMessage = AppErrorMapper.message(for: error)
+                }
+            case .success(let template):
+                writeTransaction(
+                    template.id,
+                    RecurringService.occurrenceId(templateId: template.id, date: date)
+                )
+            }
+        }
+    }
+
+    private func writeTransaction(
+        uid: String,
+        title: String,
+        amount: Int,
+        date: Date,
+        isIncome: Bool,
+        note: String,
+        category: CategoryModel,
+        recurringId: String,
+        occurrenceId: String?,
+        completion: @escaping (TransactionModel) -> Void
+    ) {
+        var data = transactionData(
+            title: title,
+            amount: amount,
+            date: date,
+            isIncome: isIncome,
+            category: category,
+            note: note,
+            recurringId: recurringId,
+            occurrenceId: occurrenceId
+        )
+
+        let collection = db.collection("users")
             .document(uid)
             .collection("transactions")
-            .addDocument(data: data) { [weak self] error in
 
+        let finish: (String) -> Void = { transactionId in
+            completion(
+                TransactionModel(
+                    id: transactionId,
+                    title: title,
+                    note: note,
+                    amount: amount,
+                    date: date,
+                    category: category,
+                    recurringId: recurringId
+                )
+            )
+        }
+
+        if let transactionId = editingTransactionId {
+            data["updatedAt"] = Timestamp(date: Date())
+
+            collection.document(transactionId).updateData(data) { [weak self] error in
                 DispatchQueue.main.async {
                     self?.isLoading = false
 
                     if let error = error {
-                        self?.errorMessage = error.localizedDescription
+                        self?.errorMessage = AppErrorMapper.message(for: error)
+                        return
+                    }
+
+                    finish(transactionId)
+                }
+            }
+            return
+        }
+
+        data["createdAt"] = Timestamp(date: Date())
+        let reference = collection.document()
+
+        reference.setData(data) { [weak self] error in
+            if let error = error {
+                DispatchQueue.main.async {
+                    self?.isLoading = false
+                    self?.errorMessage = AppErrorMapper.message(for: error)
+                }
+                return
+            }
+
+            let complete = {
+                DispatchQueue.main.async {
+                    self?.isLoading = false
+                    finish(reference.documentID)
+                }
+            }
+
+            if recurringId.isEmpty {
+                complete()
+            } else {
+                RecurringService.generateDueIfNeeded { _ in
+                    complete()
+                }
+            }
+        }
+    }
+
+    func deleteTransaction(completion: @escaping () -> Void) {
+        guard
+            let uid = Auth.auth().currentUser?.uid,
+            let transactionId = editingTransactionId
+        else {
+            errorMessage = AppErrorMapper.genericMessage
+            return
+        }
+
+        isLoading = true
+
+        db.collection("users")
+            .document(uid)
+            .collection("transactions")
+            .document(transactionId)
+            .delete { [weak self] error in
+                DispatchQueue.main.async {
+                    self?.isLoading = false
+
+                    if let error = error {
+                        self?.errorMessage = AppErrorMapper.message(for: error)
                         return
                     }
 
                     completion()
                 }
             }
+    }
+
+    private func matchingCategory(for category: CategoryModel) -> CategoryModel {
+        categories.first(where: { $0.id == category.id }) ?? category
+    }
+
+    private func transactionData(
+        title: String,
+        amount: Int,
+        date: Date,
+        isIncome: Bool,
+        category: CategoryModel,
+        note: String,
+        recurringId: String,
+        occurrenceId: String?
+    ) -> [String: Any] {
+        var data: [String: Any] = [
+            "title": title,
+            "note": note,
+            "amount": amount,
+            "isIncome": isIncome,
+            "categoryId": category.id,
+            "categoryName": category.name,
+            "categoryType": category.type.rawValue,
+            "categoryColor": category.colorHex,
+            "date": Timestamp(date: date)
+        ]
+        if !recurringId.isEmpty {
+            data["recurringId"] = recurringId
+        }
+        if let occurrenceId = occurrenceId {
+            data["recurringOccurrenceId"] = occurrenceId
+        }
+        return data
     }
 }

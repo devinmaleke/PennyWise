@@ -2,7 +2,7 @@
 //  MainTabController.swift
 //  PennyWise
 //
-//  Created by Samir iOS on 19/01/26.
+//  Created by Devin Maleke on 19/01/26.
 //
 
 import UIKit
@@ -16,18 +16,19 @@ final class MainTabBarController: UITabBarController {
         setupTabBarAppearance()
     }
 
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        setupTabBarAppearance()
+    }
+
     private func setupTabBarAppearance() {
-        // Background
-        tabBar.barTintColor = .white
-        tabBar.backgroundColor = .white
-
-        // Selected item
-        tabBar.tintColor = UIColor.init(hex: "1D2E3E")
-
-        // Unselected item
-        if #available(iOS 10.0, *) {
-            tabBar.unselectedItemTintColor = UIColor.init(hex: "DDDDDD")
-        }
+        let appearance = UITabBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .pwCard
+        tabBar.standardAppearance = appearance
+        tabBar.scrollEdgeAppearance = appearance
+        tabBar.tintColor = .pwInk
+        tabBar.unselectedItemTintColor = .pwMuted
     }
     
     private func setupTabs() {
@@ -43,11 +44,11 @@ final class MainTabBarController: UITabBarController {
             image: UIImage(systemName: "list.bullet")
         )
 
-//        let summary = makeTab(
-//            view: HomeView(),
-//            title: "Summary",
-//            image: UIImage(systemName: "chart.pie.fill")
-//        )
+        let summary = makeTab(
+            view: SummaryView(),
+            title: "Summary",
+            image: UIImage(systemName: "chart.pie.fill")
+        )
 
         let settings = makeTab(
             view: ProfileView(),
@@ -55,7 +56,7 @@ final class MainTabBarController: UITabBarController {
             image: UIImage(systemName: "person.fill")
         )
 
-        viewControllers = [home, history, settings]
+        viewControllers = [home, history, summary, settings]
     }
 
     private func makeTab<Content: View>(
@@ -65,8 +66,8 @@ final class MainTabBarController: UITabBarController {
     ) -> UIViewController {
 
         let hosting = UIHostingController(rootView: view)
+        hosting.view.backgroundColor = .clear
         hosting.tabBarItem = UITabBarItem(title: title, image: image, selectedImage: nil)
         return hosting
     }
 }
-

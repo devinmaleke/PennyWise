@@ -2,7 +2,7 @@
 //  TransactionDetailView.swift
 //  PennyWise
 //
-//  Created by Samir iOS on 21/01/26.
+//  Created by Devin Maleke on 21/01/26.
 //
 
 import SwiftUI
@@ -11,12 +11,35 @@ struct TransactionDetailView: View {
 
     @Environment(\.presentationMode) private var presentationMode
     @StateObject private var viewModel: TransactionDetailViewModel
+    @ObservedObject private var frequentStore = FrequentSpendStore.shared
+    @State private var presentedSheet: PresentedSheet?
 
-    init(category: CategoryModel, transactions: [TransactionModel]) {
+    private enum PresentedSheet: Identifiable {
+        case edit(TransactionModel)
+        case addAgain(QuickAddSource)
+
+        var id: String {
+            switch self {
+            case .edit(let transaction):
+                return "edit-\(transaction.id)"
+            case .addAgain(let source):
+                return source.id
+            }
+        }
+    }
+
+    init(
+        category: CategoryModel,
+        transactions: [TransactionModel],
+        startDate: Date? = nil,
+        endDate: Date? = nil
+    ) {
         _viewModel = StateObject(
             wrappedValue: TransactionDetailViewModel(
                 category: category,
-                transactions: transactions
+                transactions: transactions,
+                startDate: startDate,
+                endDate: endDate
             )
         )
     }
@@ -26,6 +49,13 @@ struct TransactionDetailView: View {
             AppBackgroundView()
             VStack(spacing: 0) {
                 summaryHeader
+                SearchField(
+                    text: $viewModel.searchText,
+                    placeholder: "Search title or note"
+                )
+                .padding(.horizontal)
+                .padding(.bottom, 8)
+
                 ScrollView {
                     if viewModel.filteredTransactions.isEmpty {
                         emptyState
@@ -42,12 +72,12 @@ struct TransactionDetailView: View {
                     presentationMode.wrappedValue.dismiss()
                 } label: {
                     Image(systemName: "chevron.left")
-                        .foregroundColor(Color(hex: "1D2E3E"))
+                        .foregroundColor(Color.appInk)
                 }
             }
             ToolbarItem(placement: .principal) {
                 Text(viewModel.category.name)
-                    .foregroundColor(Color(hex: "1D2E3E"))
+                    .foregroundColor(Color.appInk)
                     .bold()
             }
         }
@@ -60,6 +90,26 @@ struct TransactionDetailView: View {
                 }
             )
         }
+        .sheet(item: $presentedSheet) { sheet in
+            switch sheet {
+            case .edit(let transaction):
+                AddTransactionView(
+                    isPresented: sheetDismissBinding,
+                    transactionToEdit: transaction,
+                    onCompleted: { result in
+                        viewModel.apply(result)
+                    }
+                )
+            case .addAgain(let source):
+                QuickAddView(
+                    isPresented: sheetDismissBinding,
+                    source: source,
+                    onCompleted: { result in
+                        viewModel.apply(result)
+                    }
+                )
+            }
+        }
     }
 
     // MARK: - Summary Header
@@ -69,12 +119,17 @@ struct TransactionDetailView: View {
             Text(viewModel.formattedTotal)
                 .font(.title)
                 .bold()
-                .foregroundColor(Color(hex: "1D2E3E"))
+                .foregroundColor(Color.appInk)
+
+            if let status = viewModel.thisMonthBudgetStatus {
+                BudgetProgressRow(status: status, showsCategoryName: false)
+                    .padding(.horizontal)
+            }
             
             HStack {
                 Text(viewModel.dateRangeLabel)
                     .font(.caption)
-                    .foregroundColor(.gray)
+                    .foregroundColor(Color.appMuted)
 
                 Spacer()
 
@@ -87,13 +142,41 @@ struct TransactionDetailView: View {
                         Image(systemName: "calendar.circle.fill")
                             .imageScale(.medium)
                     }
-                    .foregroundColor(Color(hex: "1D2E3E"))
+                    .foregroundColor(Color.appInk)
                 }
             }
             .padding(.horizontal)
             .padding(.bottom, 8)
         }
         .padding(.top, 12)
+    }
+
+    private var sheetDismissBinding: Binding<Bool> {
+        Binding(
+            get: { presentedSheet != nil },
+            set: { if !$0 { presentedSheet = nil } }
+        )
+    }
+
+    private func isPinned(_ transaction: TransactionModel) -> Bool {
+        frequentStore.isPinned(title: transaction.title, categoryId: transaction.category.id)
+    }
+
+    private func togglePin(_ transaction: TransactionModel) {
+        if isPinned(transaction) {
+            frequentStore.unpin(
+                title: transaction.title,
+                categoryId: transaction.category.id
+            ) { _ in }
+            return
+        }
+
+        frequentStore.pin(
+            title: transaction.title,
+            note: transaction.note,
+            lastAmount: transaction.amount,
+            category: transaction.category
+        ) { _ in }
     }
 
     // MARK: - Transaction List (grouped by date)
@@ -106,7 +189,7 @@ struct TransactionDetailView: View {
                     // Section date header
                     Text(group.key)
                         .font(.caption)
-                        .foregroundColor(Color(hex: "466C85"))
+                        .foregroundColor(Color.appMuted)
                         .padding(.horizontal)
                         .padding(.bottom, 6)
 
@@ -115,13 +198,39 @@ struct TransactionDetailView: View {
                         ForEach(group.value) { transaction in
                             TransactionDetailList(
                                 title: transaction.title,
+                                note: transaction.note,
                                 date: transaction.date.formatted(),
-                                amount: formattedAmount(transaction.amount),
-                                isIncome: transaction.category.type == .income
+                                amount: transaction.amount.asRupiah,
+                                isIncome: transaction.category.type == .income,
+                                colorHex: transaction.category.colorHex,
+                                showsDivider: transaction.id != group.value.last?.id,
+                                isRecurring: transaction.isRecurring,
+                                onTap: {
+                                    presentedSheet = .edit(transaction)
+                                },
+                                onAddAgain: {
+                                    presentedSheet = .addAgain(.transaction(transaction))
+                                }
                             )
+                            .contextMenu {
+                                Button {
+                                    presentedSheet = .addAgain(.transaction(transaction))
+                                } label: {
+                                    Label("Add again", systemImage: "plus.circle")
+                                }
+
+                                Button {
+                                    togglePin(transaction)
+                                } label: {
+                                    Label(
+                                        isPinned(transaction) ? "Unpin from Home" : "Pin to Home",
+                                        systemImage: isPinned(transaction) ? "star.slash" : "star"
+                                    )
+                                }
+                            }
                         }
                     }
-                    .background(Color.white)
+                    .background(Color.appCard)
                     .cornerRadius(10)
                     .shadow(radius: 0.5)
                     .padding(.horizontal)
@@ -134,23 +243,12 @@ struct TransactionDetailView: View {
     // MARK: - Empty State
 
     private var emptyState: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "tray")
-                .font(.system(size: 32))
-                .foregroundColor(Color(hex: "466C85"))
-            Text("No transactions in this range")
-                .font(.caption)
-                .foregroundColor(Color(hex: "466C85"))
-        }
-        .padding(.top, 60)
-    }
-
-    // MARK: - Helper
-
-    private func formattedAmount(_ amount: Int) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.groupingSeparator = "."
-        return formatter.string(from: NSNumber(value: amount)) ?? "\(amount)"
+        EmptyStateView(
+            icon: viewModel.isSearching ? "magnifyingglass" : "calendar",
+            title: viewModel.isSearching ? "No matches" : "Nothing in this date range",
+            message: viewModel.isSearching
+                ? "Try a different title or note"
+                : "Choose a wider range to see transactions"
+        )
     }
 }

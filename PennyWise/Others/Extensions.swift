@@ -2,7 +2,7 @@
 //  Extensions.swift
 //  PennyWise
 //
-//  Created by Samir iOS on 19/01/26.
+//  Created by Devin Maleke on 19/01/26.
 //
 
 import UIKit
@@ -14,7 +14,7 @@ extension View {
             .padding()
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
-                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                    .stroke(Color.appDivider, lineWidth: 1)
             )
     }
 }
@@ -91,13 +91,44 @@ extension UIColor {
 }
 
 extension UIViewController {
-    func showAlert(_ message: String) {
+
+    private static let loadingOverlayTag = 9_810_214
+
+    func showAlert(_ message: String, title: String = "Error") {
         let alert = UIAlertController(
-            title: "Error",
+            title: title,
             message: message,
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
+    }
+
+    func setLoading(_ isLoading: Bool) {
+        view.isUserInteractionEnabled = !isLoading
+
+        if isLoading {
+            guard view.viewWithTag(Self.loadingOverlayTag) == nil else { return }
+
+            let overlay = UIView(frame: view.bounds)
+            overlay.tag = Self.loadingOverlayTag
+            overlay.backgroundColor = UIColor.black.withAlphaComponent(0.25)
+            overlay.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+
+            let spinner = UIActivityIndicatorView(style: .large)
+            spinner.color = .white
+            spinner.translatesAutoresizingMaskIntoConstraints = false
+            spinner.startAnimating()
+            overlay.addSubview(spinner)
+
+            NSLayoutConstraint.activate([
+                spinner.centerXAnchor.constraint(equalTo: overlay.centerXAnchor),
+                spinner.centerYAnchor.constraint(equalTo: overlay.centerYAnchor)
+            ])
+
+            view.addSubview(overlay)
+        } else {
+            view.viewWithTag(Self.loadingOverlayTag)?.removeFromSuperview()
+        }
     }
 }
