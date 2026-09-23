@@ -11,13 +11,13 @@ import FirebaseAuth
 enum AppRouter {
 
     static func configureInitialRoot(in window: UIWindow) {
-        AppearanceStore.shared.apply(to: window)
-
         if Auth.auth().currentUser != nil {
+            AppearanceStore.shared.apply(to: window)
             UserStore.shared.start()
             FrequentSpendStore.shared.start()
             window.rootViewController = MainTabBarController()
         } else {
+            window.overrideUserInterfaceStyle = .light
             window.rootViewController = makeOnboardingNavigation()
         }
 
@@ -28,7 +28,7 @@ enum AppRouter {
         UserStore.shared.start()
         FrequentSpendStore.shared.start()
         AppLockService.shared.lockAfterLoginIfNeeded()
-        setRoot(MainTabBarController())
+        setRoot(MainTabBarController(), usesAppAppearance: true)
     }
 
     static func showOnboarding() {
@@ -36,19 +36,24 @@ enum AppRouter {
         FrequentSpendStore.shared.stop()
         AppLockService.shared.clearForLogout()
         WidgetSnapshotStore.clear()
-        setRoot(makeOnboardingNavigation())
+        setRoot(makeOnboardingNavigation(), usesAppAppearance: false)
     }
 
     private static func makeOnboardingNavigation() -> UINavigationController {
         let navigation = UINavigationController(rootViewController: OnboardingVC())
         navigation.setNavigationBarHidden(true, animated: false)
+        navigation.overrideUserInterfaceStyle = .light
         return navigation
     }
 
-    private static func setRoot(_ viewController: UIViewController) {
+    private static func setRoot(_ viewController: UIViewController, usesAppAppearance: Bool) {
         guard let window = activeWindow else { return }
 
-        AppearanceStore.shared.apply(to: window)
+        if usesAppAppearance {
+            AppearanceStore.shared.apply(to: window)
+        } else {
+            window.overrideUserInterfaceStyle = .light
+        }
         window.rootViewController = viewController
         window.makeKeyAndVisible()
 

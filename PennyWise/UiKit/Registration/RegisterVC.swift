@@ -14,33 +14,18 @@ class RegisterVC: UIViewController {
     @IBOutlet weak var passwordTF: UITextField!
     @IBOutlet weak var registerButton: UIButton!
     @IBOutlet weak var backButton: UIButton!
-
+    @IBOutlet weak var confirmPassTF: UITextField!
+    @IBOutlet weak var revealPassButton: UIButton!
+    @IBOutlet weak var revealConfirmPassButton: UIButton!
+    
     private let viewModel = RegisterViewModel()
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        overrideUserInterfaceStyle = .light
+        view.backgroundColor = .white
         bindViewModel()
         backButton.setTitle("", for: .normal)
-        applyAppearance()
-    }
-
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        applyAppearance()
-    }
-
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        applyAppearance()
-    }
-
-    private func applyAppearance() {
-        AuthAppearance.apply(
-            to: self,
-            fields: [nameTF, emailTF, passwordTF],
-            backButton: backButton,
-            filledButtons: [registerButton]
-        )
     }
 
     private func bindViewModel() {
@@ -61,11 +46,27 @@ class RegisterVC: UIViewController {
         viewModel.register(
             name: nameTF.text ?? "",
             email: emailTF.text ?? "",
-            password: passwordTF.text ?? ""
+            password: passwordTF.text ?? "",
+            confirmPass: confirmPassTF.text ?? ""
         )
     }
 
     @IBAction func didTapBackButton(_ sender: UIButton) {
         self.navigationController?.popViewController(animated: true)
+    }
+    
+    
+    @IBAction func didTapRevealPassButton(_ sender: UIButton) {
+        togglePasswordVisibility(
+                textField: passwordTF,
+                button: sender
+            )
+    }
+    
+    @IBAction func didTapRevealConfirmPassButton(_ sender: UIButton) {
+        togglePasswordVisibility(
+                textField: confirmPassTF,
+                button: sender
+            )
     }
 }

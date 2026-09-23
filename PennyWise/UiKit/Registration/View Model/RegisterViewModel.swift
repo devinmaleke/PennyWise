@@ -13,17 +13,22 @@ class RegisterViewModel {
     var onRegisterSuccess: (() -> Void)?
     var onError: ((String) -> Void)?
 
-    func register(name: String, email: String, password: String) {
+    func register(name: String, email: String, password: String, confirmPass: String) {
         let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        guard !trimmedName.isEmpty, !trimmedEmail.isEmpty, !password.isEmpty else {
+        guard !trimmedName.isEmpty, !trimmedEmail.isEmpty, !password.isEmpty, !confirmPass.isEmpty else {
             onError?("All fields are required")
             return
         }
 
         guard password.count >= 6 else {
             onError?("Password must be at least 6 characters")
+            return
+        }
+        
+        guard password == confirmPass else {
+            onError?("Password do not match")
             return
         }
 

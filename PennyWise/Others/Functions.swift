@@ -104,3 +104,10 @@ struct AmountInputField: View {
         }
     }
 }
+
+func togglePasswordVisibility(textField: UITextField, button: UIButton) {
+    textField.isSecureTextEntry.toggle()
+
+    let imageName = textField.isSecureTextEntry ? "eye.slash" : "eye"
+    button.setImage(UIImage(systemName: imageName), for: .normal)
+}

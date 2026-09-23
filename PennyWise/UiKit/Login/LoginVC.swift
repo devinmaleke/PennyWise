@@ -14,34 +14,15 @@ class LoginVC: UIViewController {
 
     @IBOutlet weak var backButton: UIButton!
 
+    @IBOutlet weak var revealPassButton: UIButton!
     private let viewModel = LoginViewModel()
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        overrideUserInterfaceStyle = .light
+        view.backgroundColor = .white
         bindViewModel()
         backButton.setTitle("", for: .normal)
-        applyAppearance()
-    }
-
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        applyAppearance()
-    }
-
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        applyAppearance()
-    }
-
-    private func applyAppearance() {
-        AuthAppearance.apply(
-            to: self,
-            fields: [usernameTF, passwordTF],
-            backButton: backButton
-        )
-        view.subviews.compactMap { $0 as? UIButton }.filter { $0 !== backButton }.forEach {
-            AuthAppearance.styleFilledButton($0)
-        }
     }
 
     @IBAction func didTapButton(_ sender: UIButton) {
@@ -66,5 +47,13 @@ class LoginVC: UIViewController {
         viewModel.onError = { [weak self] message in
             self?.showAlert(message)
         }
+    }
+    
+    
+    @IBAction func revealPassButton(_ sender: UIButton) {
+        togglePasswordVisibility(
+                textField: passwordTF,
+                button: sender
+            )
     }
 }
